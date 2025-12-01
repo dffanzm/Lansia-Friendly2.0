@@ -1,0 +1,11 @@
+/* Styles untuk konten halaman web */
+.lansia-highlight {
+  background-color: rgba(67, 97, 238, 0.1) !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.lansia-speaking {
+  background-color: rgba(76, 201, 240, 0.2) !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
+}

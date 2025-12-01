@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Lansia Friendly",
+  "version": "1.0.0",
+  "description": "Extension untuk membantu navigasi web bagi lansia",
+
+  "permissions": ["activeTab", "storage", "scripting"],
+
+  "host_permissions": ["http://localhost:8080/*", "<all_urls>"],
+
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "css": ["content/styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "background": {
+    "service_worker": "background/background.js"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
