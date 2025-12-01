@@ -1,0 +1,36 @@
+/* Lansia Friendly Extension Styles */
+
+/* Text highlight on hover */
+.lansia-highlight {
+  background-color: rgba(67, 97, 238, 0.1) !important;
+  transition: background-color 0.3s ease !important;
+  border-radius: 3px !important;
+  padding: 2px 0 !important;
+}
+
+/* Speaking indicator */
+.lansia-speaking {
+  background-color: rgba(76, 201, 240, 0.3) !important;
+  border: 2px solid #4cc9f0 !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
+}
+
+/* Big cursor (applied via JS) */
+.lansia-big-cursor {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="%234361ee" opacity="0.7"/><circle cx="16" cy="16" r="8" fill="white"/></svg>')
+      16 16,
+    auto !important;
+}
+
+/* Large text mode */
+.lansia-large-text {
+  font-size: 120% !important;
+  line-height: 1.8 !important;
+}
+
+/* Accessibility focus */
+.lansia-focus-element {
+  outline: 3px solid #f72585 !important;
+  outline-offset: 2px !important;
+}
