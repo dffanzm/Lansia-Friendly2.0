@@ -26,54 +26,45 @@ const statusText = document.getElementById("statusText");
 const connectionStatus = document.getElementById("connectionStatus");
 const testBtn = document.getElementById("testBtn");
 
-// Load saved state
-chrome.storage.sync.get(["lansiaSettings"], (result) => {
-  if (result.lansiaSettings) {
-    Object.assign(state, result.lansiaSettings);
-    updateUI();
-  }
-  checkBackendConnection();
-});
+// Initialize
+loadState();
+updateUI();
+checkBackendConnection();
 
 // Event Listeners
 globalToggle.addEventListener("change", (e) => {
   state.isActive = e.target.checked;
-  statusText.textContent = state.isActive ? "ON" : "OFF";
-  statusText.style.color = state.isActive ? "#4cc9f0" : "#f72585";
-  saveState();
-  sendStateToContentScript();
+  updateStatusText();
+  saveAndApply();
 });
 
 voiceToggle.addEventListener("change", (e) => {
   state.voiceEnabled = e.target.checked;
-  saveState();
-  sendStateToContentScript();
+  saveAndApply();
 });
 
 cursorToggle.addEventListener("change", (e) => {
   state.cursorEnabled = e.target.checked;
-  saveState();
-  sendStateToContentScript();
+  saveAndApply();
 });
 
 voiceSpeed.addEventListener("input", (e) => {
   state.voiceSpeed = parseFloat(e.target.value);
   speedValue.textContent = `${state.voiceSpeed.toFixed(1)}x`;
-  saveState();
-  sendStateToContentScript();
+  saveAndApply();
 });
 
 cursorSize.addEventListener("input", (e) => {
   state.cursorSize = parseFloat(e.target.value);
   cursorSizeValue.textContent = `${state.cursorSize}x`;
-  saveState();
-  sendStateToContentScript();
+  saveAndApply();
 });
 
 decreaseText.addEventListener("click", () => {
   if (state.textSize > 50) {
     state.textSize -= 10;
     updateTextSize();
+    forceTextResizeOnPage();
   }
 });
 
@@ -81,19 +72,36 @@ increaseText.addEventListener("click", () => {
   if (state.textSize < 200) {
     state.textSize += 10;
     updateTextSize();
+    forceTextResizeOnPage();
   }
 });
 
 resetText.addEventListener("click", () => {
   state.textSize = 100;
   updateTextSize();
+  forceTextResizeOnPage();
 });
 
 testBtn.addEventListener("click", () => {
   testTTSBackend();
 });
 
+// Help button
+document.getElementById("helpBtn").addEventListener("click", () => {
+  alert(
+    "Lansia Friendly Extension\n\nFitur:\n1. 🔊 Mode Suara: Hover di teks untuk mendengar\n2. 🔠 Ukuran Teks: Perbesar/perkecil semua teks\n3. 🖱️ Kursor Besar: Kursor besar untuk visibilitas\n\nPastikan backend berjalan di localhost:8080"
+  );
+});
+
 // Functions
+function loadState() {
+  chrome.storage.sync.get(["lansiaSettings"], (result) => {
+    if (result.lansiaSettings) {
+      Object.assign(state, result.lansiaSettings);
+    }
+  });
+}
+
 function updateUI() {
   globalToggle.checked = state.isActive;
   voiceToggle.checked = state.voiceEnabled;
@@ -102,15 +110,42 @@ function updateUI() {
   speedValue.textContent = `${state.voiceSpeed.toFixed(1)}x`;
   cursorSize.value = state.cursorSize;
   cursorSizeValue.textContent = `${state.cursorSize}x`;
-  textSizeValue.textContent = `${state.textSize}%`;
+  updateStatusText();
+  updateTextSizeDisplay();
+}
+
+function updateStatusText() {
   statusText.textContent = state.isActive ? "ON" : "OFF";
   statusText.style.color = state.isActive ? "#4cc9f0" : "#f72585";
 }
 
-function updateTextSize() {
+function updateTextSizeDisplay() {
   textSizeValue.textContent = `${state.textSize}%`;
+}
+
+function updateTextSize() {
+  updateTextSizeDisplay();
+  saveAndApply();
+}
+
+function saveAndApply() {
   saveState();
   sendStateToContentScript();
+
+  // Force text resize update
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]?.id) {
+      chrome.tabs
+        .sendMessage(tabs[0].id, {
+          type: "FORCE_TEXT_RESIZE",
+          textSize: state.textSize,
+        })
+        .catch(() => {
+          // If content script not ready, reload page
+          chrome.tabs.reload(tabs[0].id);
+        });
+    }
+  });
 }
 
 function saveState() {
@@ -126,11 +161,28 @@ function sendStateToContentScript() {
           settings: state,
         })
         .catch(() => {
-          // Tab might not have content script yet
-          console.log("Content script not ready");
+          // Retry injection if content script not loaded
+          injectContentScript(tabs[0].id);
         });
     }
   });
+}
+
+function injectContentScript(tabId) {
+  chrome.scripting
+    .executeScript({
+      target: { tabId: tabId },
+      files: ["content/content.js"],
+    })
+    .then(() => {
+      // Send settings after injection
+      setTimeout(() => {
+        chrome.tabs.sendMessage(tabId, {
+          type: "UPDATE_SETTINGS",
+          settings: state,
+        });
+      }, 100);
+    });
 }
 
 async function checkBackendConnection() {
@@ -144,8 +196,8 @@ async function checkBackendConnection() {
   } catch (error) {
     state.backendConnected = false;
     connectionStatus.innerHTML =
-      '<div class="status-dot" style="background: #f72585;"></div><span>Backend: Disconnected</span>';
-    console.warn("Backend connection failed:", error);
+      '<div class="status-dot disconnected"></div><span>Backend: Disconnected</span>';
+    connectionStatus.querySelector(".status-dot").style.background = "#f72585";
   }
 }
 
@@ -178,5 +230,39 @@ async function testTTSBackend() {
   }
 }
 
-// Initialize
-updateUI();
+// Function untuk force text resize
+function forceTextResizeOnPage() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]?.id) {
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        func: (textSize) => {
+          // Force apply text size
+          document.documentElement.style.fontSize = textSize + "%";
+          document.documentElement.classList.add("lansia-text-resized");
+
+          // Apply to all text elements
+          const allElements = document.querySelectorAll("*");
+          allElements.forEach((element) => {
+            if (
+              element.tagName !== "INPUT" &&
+              element.tagName !== "TEXTAREA" &&
+              element.tagName !== "SELECT" &&
+              element.tagName !== "BUTTON"
+            ) {
+              element.style.fontSize = "inherit";
+            }
+          });
+
+          // Trigger reflow
+          document.body.style.visibility = "hidden";
+          document.body.offsetHeight;
+          document.body.style.visibility = "visible";
+
+          console.log("📏 Force text resize to:", textSize + "%");
+        },
+        args: [state.textSize],
+      });
+    }
+  });
+}

@@ -11,9 +11,9 @@
   "action": {
     "default_popup": "popup/index.html",
     "default_icon": {
-      "16": "icons/icon-16.png",
-      "48": "icons/icon-48.png",
-      "128": "icons/icon-128.png"
+      "16": "assets/icons/icon-16.png",
+      "48": "assets/icons/icon-48.png",
+      "128": "assets/icons/icon-128.png"
     }
   },
 
@@ -22,7 +22,8 @@
       "matches": ["<all_urls>"],
       "js": ["content/content.js"],
       "css": ["content/styles.css"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": true
     }
   ],
 
@@ -30,9 +31,16 @@
     "service_worker": "background/background.js"
   },
 
+  "web_accessible_resources": [
+    {
+      "resources": ["content/styles.css"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
   "icons": {
-    "16": "icons/icon-16.png",
-    "48": "icons/icon-48.png",
-    "128": "icons/icon-128.png"
+    "16": "assets/icons/icon-16.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
   }
 }

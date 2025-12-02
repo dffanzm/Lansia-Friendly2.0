@@ -15,10 +15,10 @@ func main() {
 	r := mux.NewRouter()
 
 	// API Routes
-	r.HandleFunc("/api/tts", handlers.TextToSpeechHandler).Methods("POST")
-	r.HandleFunc("/api/health", handlers.HealthCheck).Methods("GET")
-	r.HandleFunc("/api/voices", handlers.GetVoicesHandler).Methods("GET")
-	r.HandleFunc("/api/config", handlers.GetConfigHandler).Methods("GET")
+	r.HandleFunc("/api/tts", handlers.TextToSpeechHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/api/health", handlers.HealthCheck).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/voices", handlers.GetVoicesHandler).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/config", handlers.GetConfigHandler).Methods("GET", "OPTIONS")
 
 	// CORS configuration for Chrome Extension
 	c := cors.New(cors.Options{
@@ -28,19 +28,20 @@ func main() {
 			"http://localhost:*",       // Local development
 			"http://127.0.0.1:*",
 		},
-		AllowedMethods: []string{"GET", "POST", "OPTIONS"},
-		AllowedHeaders: []string{"Content-Type", "Authorization"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization", "X-Requested-With"},
 		AllowCredentials: true,
-		MaxAge: 300,
+		MaxAge:           86400,
+		Debug:            false,
 	})
 
 	// Create server with timeout settings
 	server := &http.Server{
 		Handler:      c.Handler(r),
 		Addr:         ":8080",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-		IdleTimeout:  60 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
 
 	log.Println("🚀 Lansia Friendly Backend starting on :8080")

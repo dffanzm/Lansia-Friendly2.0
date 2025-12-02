@@ -23,6 +23,16 @@ type TTSResponse struct {
 }
 
 func TextToSpeechHandler(w http.ResponseWriter, r *http.Request) {
+	// CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	var req TTSRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		respondJSON(w, http.StatusBadRequest, TTSResponse{
@@ -33,10 +43,20 @@ func TextToSpeechHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate text
-	if strings.TrimSpace(req.Text) == "" {
+	text := strings.TrimSpace(req.Text)
+	if text == "" {
 		respondJSON(w, http.StatusBadRequest, TTSResponse{
 			Success: false,
 			Message: "Text cannot be empty",
+		})
+		return
+	}
+
+	// Validate text length
+	if len(text) > 5000 {
+		respondJSON(w, http.StatusBadRequest, TTSResponse{
+			Success: false,
+			Message: "Text too long (max 5000 characters)",
 		})
 		return
 	}
@@ -46,13 +66,15 @@ func TextToSpeechHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Execute TTS based on OS
 	var cmd *exec.Cmd
+	var err error
+	
 	switch runtime.GOOS {
 	case "darwin": // macOS
-		cmd = exec.Command("say", req.Text)
+		cmd = exec.Command("say", cleanTextForTTS(text))
 	case "linux": // Linux
-		cmd = exec.Command("espeak", "-v", "id", req.Text)
+		cmd = exec.Command("espeak", "-v", "id", cleanTextForTTS(text))
 	case "windows": // Windows
-		psScript := `Add-Type -AssemblyName System.speech; $speak = New-Object System.Speech.Synthesis.SpeechSynthesizer; $speak.Speak("` + escapeForPowerShell(req.Text) + `")`
+		psScript := `Add-Type -AssemblyName System.speech; $speak = New-Object System.Speech.Synthesis.SpeechSynthesizer; $speak.Speak("` + escapeForPowerShell(cleanTextForTTS(text)) + `")`
 		cmd = exec.Command("powershell", "-Command", psScript)
 	default:
 		respondJSON(w, http.StatusInternalServerError, TTSResponse{
@@ -63,7 +85,7 @@ func TextToSpeechHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Run TTS command
-	if err := cmd.Run(); err != nil {
+	if err = cmd.Run(); err != nil {
 		respondJSON(w, http.StatusInternalServerError, TTSResponse{
 			Success: false,
 			Message: "Failed to speak text: " + err.Error(),
@@ -83,6 +105,8 @@ func TextToSpeechHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	
 	respondJSON(w, http.StatusOK, map[string]interface{}{
 		"status":    "healthy",
 		"service":   "lansia-tts",
@@ -93,6 +117,8 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetVoicesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	
 	voices := []string{"id-ID", "en-US", "en-GB"}
 	if runtime.GOOS == "darwin" {
 		voices = append(voices, "id", "en", "es", "fr")
@@ -105,6 +131,8 @@ func GetVoicesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetConfigHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	
 	respondJSON(w, http.StatusOK, map[string]interface{}{
 		"extension_name": "Lansia Friendly",
 		"version": "1.0.0",
@@ -125,6 +153,15 @@ func GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 func escapeForPowerShell(text string) string {
 	text = strings.ReplaceAll(text, `"`, `\"`)
 	text = strings.ReplaceAll(text, "$", "`$")
+	text = strings.ReplaceAll(text, "'", "`'")
+	return text
+}
+
+func cleanTextForTTS(text string) string {
+	// Remove extra whitespace
+	text = strings.Join(strings.Fields(text), " ")
+	// Escape quotes
+	text = strings.ReplaceAll(text, `"`, `\"`)
 	return text
 }
 
