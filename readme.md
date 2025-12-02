@@ -80,11 +80,6 @@ Local REST API (Go Backend)
 ├─ Linux: espeak
 └─ Windows: PowerShell TTS
 
-yaml
-Salin kode
-
----
-
 ## 📁 Project Structure
 
 lansia-friendly/
@@ -105,11 +100,6 @@ lansia-friendly/
 ├── docker-compose.yml
 ├── .gitignore
 └── README.md
-
-yaml
-Salin kode
-
----
 
 ## 🚀 Quick Start
 
