@@ -82,7 +82,7 @@ Local REST API (Go Backend)
 ### **📁 Project Structure**
 
 lansia-friendly/
-├── backend/
+backend/
 │   ├── main.go
 │   ├── go.mod
 │   ├── handlers/
