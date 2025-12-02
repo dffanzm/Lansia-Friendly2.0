@@ -79,7 +79,7 @@ Local REST API (Go Backend)
 
 ---
 
-## 📁 Project Structure
+### **📁 Project Structure**
 
 lansia-friendly/
 ├── backend/
