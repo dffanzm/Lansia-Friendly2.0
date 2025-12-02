@@ -79,29 +79,30 @@ Local REST API (Go Backend)
 
 ---
 
-### **📁 Project Structure**
+### 📁 Project Structure
 
+```text
 lansia-friendly/
-backend/
-│   ├── main.go
-│   ├── go.mod
-│   ├── handlers/
-│   ├── services/
-│   └── Dockerfile
+├── backend/                  # Server-side logic menggunakan Golang
+│   ├── main.go               # Entry point untuk menjalankan server
+│   ├── go.mod                # Daftar dependensi/library Go
+│   ├── handlers/             # Mengatur request & response API
+│   ├── services/             # Logika bisnis utama aplikasi
+│   └── Dockerfile            # Konfigurasi untuk build image backend
 │
-├── frontend/
-│   ├── manifest.json
-│   ├── assets/
-│   ├── background/
-│   ├── content/
-│   └── popup/
+├── frontend/                 # Client-side (Browser Extension)
+│   ├── manifest.json         # Konfigurasi utama ekstensi (permissions, versi, dll)
+│   ├── assets/               # Folder untuk icon dan gambar
+│   ├── background/           # Script yang berjalan di background browser
+│   ├── content/              # Script yang berinteraksi dengan halaman web
+│   └── popup/                # Tampilan UI saat icon ekstensi diklik
 │       ├── index.html
 │       ├── style.css
 │       └── script.js
 │
-├── docker-compose.yml
-├── .gitignore
-└── README.md
+├── docker-compose.yml        # Konfigurasi untuk menjalankan seluruh container
+├── .gitignore                # Daftar file yang diabaikan oleh Git
+└── README.md                 # Dokumentasi proyek ini
 
 
 ## 🚀 Quick Start
