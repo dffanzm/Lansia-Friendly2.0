@@ -83,29 +83,25 @@ Local REST API (Go Backend)
 
 lansia-friendly/
 ├── backend/
-│ ├── main.go
-│ ├── go.mod
-│ ├── handlers/
-│ ├── services/
-│ └── Dockerfile
+│   ├── main.go
+│   ├── go.mod
+│   ├── handlers/
+│   ├── services/
+│   └── Dockerfile
 │
 ├── frontend/
-│ ├── manifest.json
-│ ├── assets/
-│ ├── background/
-│ ├── content/
-│ └── popup/
-│ ├── index.html
-│ ├── style.css
-│ └── script.js
+│   ├── manifest.json
+│   ├── assets/
+│   ├── background/
+│   ├── content/
+│   └── popup/
+│       ├── index.html
+│       ├── style.css
+│       └── script.js
 │
 ├── docker-compose.yml
 ├── .gitignore
 └── README.md
-
-yaml
-Salin kode
-
 ---
 
 ## 🚀 Quick Start
