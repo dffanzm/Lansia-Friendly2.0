@@ -34,25 +34,22 @@ Proyek ini menggabungkan **Chrome Extension** + **Local Backend (Go)** untuk men
 ## ✨ Features
 
 ### 🔊 Smart Text-to-Speech
-
-- Hover langsung ke TTS
-- Multi-platform (macOS / Linux / Windows)
-- Speed control 0.5×–2×
-- Bahasa Indonesia & English
+- Hover langsung ke TTS  
+- Multi-platform (macOS / Linux / Windows)  
+- Speed control 0.5×–2×  
+- Bahasa Indonesia & English  
 
 ### 🔠 Global Text Resizing
-
-- Scaling berbasis inheritance
-- Layout tetap aman
-- Real-time update
-- Range 50%–200%
+- Scaling berbasis inheritance  
+- Layout tetap aman  
+- Real-time update  
+- Range 50%–200%  
 
 ### 🖱️ Enhanced Cursor Visibility
-
-- Big cursor custom (SVG)
-- Ukuran 1×–5×
-- Auto pointer detection
-- Non-intrusive
+- Big cursor custom (SVG)  
+- Ukuran 1×–5×  
+- Auto pointer detection  
+- Non-intrusive  
 
 ---
 
@@ -60,25 +57,27 @@ Proyek ini menggabungkan **Chrome Extension** + **Local Backend (Go)** untuk men
 
 ### **Tech Stack Rationale**
 
-| Component | Technology       | Why                                   |
-| --------- | ---------------- | ------------------------------------- |
-| Backend   | Go               | Fast, ringan, ideal buat local server |
-| Frontend  | Chrome Extension | Akses langsung ke DOM website         |
-| API       | REST             | Simpel dan universal                  |
-| Deploy    | Docker           | Konsisten & gampang dipasang          |
+| Component | Technology | Why |
+| --------- | ---------- | ------------------------------------- |
+| Backend   | Go         | Fast, ringan, ideal buat local server |
+| Frontend  | Chrome Extension | Akses langsung ke DOM website |
+| API       | REST       | Simpel dan universal |
+| Deploy    | Docker     | Konsisten & gampang dipasang |
 
 ### **System Architecture**
 
-Browser (Chrome)
-├─ Popup UI (React)
-├─ Content Script
-└─ Background Script
-│
-▼
-Local REST API (Go Backend)
-├─ macOS: say
-├─ Linux: espeak
-└─ Windows: PowerShell TTS
+Browser (Chrome)  
+ ├── Popup UI (React)  
+ ├── Content Script  
+ └── Background Script  
+  │  
+  ▼  
+Local REST API (Go Backend)  
+ ├── macOS: say  
+ ├── Linux: espeak  
+ └── Windows: PowerShell TTS  
+
+---
 
 ## 📁 Project Structure
 
@@ -96,23 +95,29 @@ lansia-friendly/
 │ ├── background/
 │ ├── content/
 │ └── popup/
+│ ├── index.html
+│ ├── style.css
+│ └── script.js
 │
 ├── docker-compose.yml
 ├── .gitignore
 └── README.md
 
+yaml
+Salin kode
+
+---
+
 ## 🚀 Quick Start
 
 ### **Prerequisites**
-
 - Go 1.21+
 - Node.js 16+
 - Google Chrome
 - TTS engine OS masing-masing
 
 ### **1. Clone Repo**
-
-````bash
+```bash
 git clone https://github.com/yourusername/lansia-friendly.git
 cd lansia-friendly
 2. Start Backend
@@ -120,14 +125,14 @@ bash
 Salin kode
 cd backend
 go run main.go
-Runs at http://localhost:8080
+Runs at: http://localhost:8080
 
 3. Load Chrome Extension
 Buka chrome://extensions/
 
 Enable Developer Mode
 
-Load unpacked → pilih folder frontend
+Klik Load unpacked → pilih folder frontend
 
 4. Test Fitur
 Hover teks → TTS
@@ -213,13 +218,13 @@ Memory Backend	~15MB
 Memory Ext	~5MB
 
 🌍 Real-World Impact
-"Teknologi harus mempermudah, bukan menghalangi."
+“Teknologi harus mempermudah, bukan menghalangi.”
 
 Cerita user:
 
-“Ibu Sari (68)” — bisa baca berita tanpa bantuan
+Ibu Sari (68) — bisa baca berita tanpa bantuan
 
-“Pak Budi (72)” — bisa online banking dengan percaya diri
+Pak Budi (72) — bisa online banking dengan percaya diri
 
 ❓ FAQ
 Q: Works on all sites?
@@ -246,4 +251,3 @@ Made with ❤️ for our elders
 ⭐ Jangan lupa kasih star biar makin naik ke FYP GitHub ⭐
 
 </div> ```
-````
